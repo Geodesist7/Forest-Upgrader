@@ -4,28 +4,50 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public float MovementSpeed = 1;
-    public Animator AnimatorController;
-    void Update()
+    [SerializeField] private float speed;
+    [SerializeField] private float rotationSpeed;
+    [SerializeField] private float reloadTime;
+
+    private Rigidbody _rb;
+    private Animator _anim;
+    private bool _canHit = true;
+
+    private void Start()
     {
-        Move();
+        _rb = GetComponent<Rigidbody>();
+        _anim = GetComponent<Animator>();
     }
-    private void Move() // метод перемещения персонажа
+
+    private void FixedUpdate()
     {
-        //if (attackingTimer > 0) return; // убираем возможность перемещения при атаке
+        MovePlayer();
+    }
+    private void MovePlayer() 
+    {
+        Vector3 moveInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
-        var horizontal = Input.GetAxis("Horizontal");
-        var vertical = Input.GetAxis("Vertical");
-        var targetLookPosition = new Vector3(horizontal, 0, vertical); // вектор направления движения
-
-        if (targetLookPosition != Vector3.zero) // если мы куда-то хотим двигаться
+        if (moveInput.magnitude > 0.1f) //если длина вектора больше 0.1 то выполняем поворот
         {
-            transform.rotation = Quaternion.LookRotation(targetLookPosition); // поворачиваем персонажа на targetLookPosition
-            transform.position += MovementSpeed * Time.deltaTime * targetLookPosition.normalized; // перемещаем персонажа в сторону нормализованного targetLookPosition
-            AnimatorController.SetBool("isWalk", true); // анимируем (требует оптимизации? bool)
-        }
-        else
-            AnimatorController.SetBool("isWalk", false); // выключаем анимацию (требует оптимизации? bool)
-    }
+            //поворот игрока:
+            Quaternion rotation = Quaternion.LookRotation(moveInput);
+            rotation.x = 0;
+            rotation.z = 0;
+            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime); //плавное перемещение 
 
+        }
+        _rb.velocity = moveInput * speed;
+        _anim.SetBool("isWalk", moveInput.magnitude > 0.1f);
+
+        if (Input.GetMouseButton(0) && _canHit == true) 
+        {
+            _anim.SetTrigger("attack");
+            StartCoroutine(Reload());
+        }
+    }
+     IEnumerator Reload() //куратина которая работает в потоке от других методов
+    {
+        _canHit = false;
+        yield return new WaitForSeconds(reloadTime);
+        _canHit = true;
+    }
 }
