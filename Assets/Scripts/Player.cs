@@ -7,15 +7,20 @@ public class Player : MonoBehaviour
     [SerializeField] private float speed;
     [SerializeField] private float rotationSpeed;
     [SerializeField] private float reloadTime;
+    [SerializeField] private int startHealth;
+    [SerializeField] private PlayerUI ui;
 
     private Rigidbody _rb;
     private Animator _anim;
     private bool _canHit = true;
+    private int _health;
 
     private void Start()
     {
         _rb = GetComponent<Rigidbody>();
         _anim = GetComponent<Animator>();
+
+        _health = startHealth;
     }
 
     private void FixedUpdate()
@@ -49,5 +54,16 @@ public class Player : MonoBehaviour
         _canHit = false;
         yield return new WaitForSeconds(reloadTime);
         _canHit = true;
+    }
+
+    public void GetDamage(int damage) 
+    {
+        _health -= damage;
+        ui.SetHealth(_health);
+
+        if (_health <= 0) 
+        {
+            Debug.Log("Game over");
+        }
     }
 }
