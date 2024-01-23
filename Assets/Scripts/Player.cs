@@ -9,6 +9,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float reloadTime;
     [SerializeField] private int startHealth;
     [SerializeField] private PlayerUI ui;
+    [SerializeField] private Transform hitPoint;
+    [SerializeField] private float hitRadius;
 
     private Rigidbody _rb;
     private Animator _anim;
@@ -45,8 +47,7 @@ public class Player : MonoBehaviour
 
         if (Input.GetMouseButton(0) && _canHit == true) 
         {
-            _anim.SetTrigger("attack");
-            StartCoroutine(Reload());
+            Hit();
         }
     }
      IEnumerator Reload() //куратина которая работает в потоке от других методов
@@ -65,5 +66,20 @@ public class Player : MonoBehaviour
         {
             Debug.Log("Game over");
         }
+    }
+    private void Hit() 
+    {
+        Collider[] colliders = Physics.OverlapSphere(hitPoint.position, hitRadius);
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            if (colliders[i].TryGetComponent<Tree> (out _))
+            {
+                ui.TreeCount++;
+                Destroy(colliders[i].gameObject);
+            }
+        }
+
+        _anim.SetTrigger("attack");
+        StartCoroutine(Reload());
     }
 }
