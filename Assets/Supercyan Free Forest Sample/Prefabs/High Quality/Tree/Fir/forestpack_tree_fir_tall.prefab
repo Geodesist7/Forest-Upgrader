@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 205763282677625166}
   - component: {fileID: 136636269291330438}
   - component: {fileID: 3084091502927637992}
+  - component: {fileID: 3973215964336516645}
   m_Layer: 0
   m_Name: forestpack_tree_fir_tall
   m_TagString: Untagged
@@ -163,3 +164,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bd50e176d542ef44b53cfb56c93ddb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isRespawned: 0
+--- !u!95 &3973215964336516645
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210459693873458}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 5078c9d7f88fb314ebbd74efa83ddb42, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

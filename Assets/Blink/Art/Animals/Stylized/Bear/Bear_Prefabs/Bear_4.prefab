@@ -1946,6 +1946,7 @@ GameObject:
   - component: {fileID: 3734775969355451150}
   - component: {fileID: 8316747022979778989}
   - component: {fileID: -5340092458011248484}
+  - component: {fileID: 7319381176981110550}
   m_Layer: 0
   m_Name: Bear_4
   m_TagString: Untagged
@@ -2030,6 +2031,27 @@ MonoBehaviour:
   radius: 2
   reloadTime: 2
   damage: 1
+--- !u!65 &7319381176981110550
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7962199819078159310}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.72, y: 1.8, z: 2.96}
+  m_Center: {x: 0.04, y: 0.58, z: -0.27}
 --- !u!1 &8002475675295336084
 GameObject:
   m_ObjectHideFlags: 0

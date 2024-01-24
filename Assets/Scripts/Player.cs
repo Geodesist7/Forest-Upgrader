@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -29,7 +30,7 @@ public class Player : MonoBehaviour
     {
         MovePlayer();
     }
-    private void MovePlayer() 
+    private void MovePlayer()
     {
         Vector3 moveInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
@@ -45,41 +46,45 @@ public class Player : MonoBehaviour
         _rb.velocity = moveInput * speed;
         _anim.SetBool("isWalk", moveInput.magnitude > 0.1f);
 
-        if (Input.GetMouseButton(0) && _canHit == true) 
+        if (Input.GetMouseButton(0) && _canHit == true)
         {
-            Hit();
+            _anim.SetTrigger("attack");
+            StartCoroutine(Reload());
         }
     }
-     IEnumerator Reload() //куратина которая работает в потоке от других методов
+    IEnumerator Reload() //куратина которая работает в потоке от других методов
     {
         _canHit = false;
         yield return new WaitForSeconds(reloadTime);
         _canHit = true;
     }
 
-    public void GetDamage(int damage) 
+    public void GetDamage(int damage)
     {
         _health -= damage;
         ui.SetHealth(_health);
 
-        if (_health <= 0) 
+        if (_health <= 0)
         {
-            Debug.Log("Game over");
+            SceneManager.LoadScene(0);
         }
     }
-    private void Hit() 
+    private void Hit()
     {
         Collider[] colliders = Physics.OverlapSphere(hitPoint.position, hitRadius);
         for (int i = 0; i < colliders.Length; i++)
         {
-            if (colliders[i].TryGetComponent<Tree> (out _))
+            if (colliders[i].TryGetComponent(out Tree tree) && tree.isRespawned)
             {
                 ui.TreeCount++;
+                tree.Destroy();
+            }
+            if (colliders[i].TryGetComponent<Enemy>(out _))
+            {
                 Destroy(colliders[i].gameObject);
             }
         }
 
-        _anim.SetTrigger("attack");
-        StartCoroutine(Reload());
+       
     }
 }
