@@ -2170,6 +2170,9 @@ MonoBehaviour:
   count: 200
   treePrefab: {fileID: 1198581150999839837, guid: cad54f4a09c39574fa7043e578a0955d,
     type: 3}
+  treeMask:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!4 &1845547361
 Transform:
   m_ObjectHideFlags: 0

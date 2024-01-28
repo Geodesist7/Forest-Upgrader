@@ -69,8 +69,10 @@ public class Player : MonoBehaviour
             SceneManager.LoadScene(0);
         }
     }
+
     private void Hit()
     {
+        
         Collider[] colliders = Physics.OverlapSphere(hitPoint.position, hitRadius);
         for (int i = 0; i < colliders.Length; i++)
         {
@@ -79,9 +81,10 @@ public class Player : MonoBehaviour
                 ui.TreeCount++;
                 tree.Destroy();
             }
-            if (colliders[i].TryGetComponent<Enemy>(out _))
+            if (colliders[i].TryGetComponent<Enemy>(out var enemy))
             {
-                Destroy(colliders[i].gameObject);
+                enemy.Die();
+                //Destroy(colliders[i].gameObject);
             }
         }
 

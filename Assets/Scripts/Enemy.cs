@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 public class Enemy : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class Enemy : MonoBehaviour
     private Animator _anim;
     private bool _canHit;
     private bool _isReloaded = true;
+    private bool _isDead;
+    public float Hp;
 
     private void Start()
     {
@@ -24,11 +27,13 @@ public class Enemy : MonoBehaviour
     }
     private void Update()
     {
+        if (_isDead) 
+        {
+            return;
+        }
         _agent.SetDestination(_target.position); //задаем нашему агенту позицию до которой нужно дойти 
         _anim.SetBool("isRun", _agent.velocity.magnitude > 0.1f);
-
         bool isDistance = Vector3.Distance(transform.position, _target.position) < _agent.stoppingDistance;//если дистанция между врагом и играком будет меньше
-
         _canHit = isDistance;
 
         if (_canHit && _isReloaded)
@@ -42,9 +47,15 @@ public class Enemy : MonoBehaviour
                     player.GetDamage(damage);
                 }
             }
-
             StartCoroutine(Reload());
         }
+    }
+    public void Die()
+    {
+        GetComponent<Collider>().enabled = false;
+        _isDead = true;
+        _anim.SetTrigger("Die");
+        Destroy(gameObject, 3.2f);
     }
     IEnumerator Reload() 
     {
