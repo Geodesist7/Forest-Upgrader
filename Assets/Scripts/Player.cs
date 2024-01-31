@@ -1,24 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private float speed;
-    [SerializeField] private float rotationSpeed;
-    [SerializeField] private float reloadTime;
-    [SerializeField] private int startHealth;
-    [SerializeField] private PlayerUI ui;
-    [SerializeField] private Transform hitPoint;
-    [SerializeField] private float hitRadius;
+    [SerializeField] private float speed; //Определяет скорость движения игрока.
+    [SerializeField] private float rotationSpeed; //Определяет скорость поворота игрока.
+    [SerializeField] private float reloadTime; //Время перезарядки между атаками.
+    [SerializeField] private int startHealth; //Начальное количество здоровья игрока.
+    [SerializeField] private PlayerUI ui; //Ссылка на компонент интерфейса игрока (вероятно, UI, который отображает здоровье и другую информацию).
+    [SerializeField] private Transform hitPoint; //Точка, откуда начинается атака.
+    [SerializeField] private float hitRadius; //Радиус атаки игрока.
 
-    private Rigidbody _rb;
-    private Animator _anim;
-    private bool _canHit = true;
-    private int _health;
+
+    private Rigidbody _rb; //Ссылка на компонент Rigidbody игрока.
+    private Animator _anim; //Ссылка на компонент Animator игрока.
+    private bool _canHit = true; //Флаг, указывающий, может ли игрок совершить атаку в данный момент.
+    private int _health; //Текущее количество здоровья игрока.
 
     private void Start()
+    // Метод Вызывается при запуске сцены.
+    //Инициализирует необходимые компоненты и переменные.
+     
     {
         _rb = GetComponent<Rigidbody>();
         _anim = GetComponent<Animator>();
@@ -27,10 +32,16 @@ public class Player : MonoBehaviour
     }
 
     private void FixedUpdate()
+    //Вызывается на каждом кадре с постоянной частотой.
+    //Вызывает метод MovePlayer, отвечающий за движение игрока.
     {
         MovePlayer();
     }
     private void MovePlayer()
+    // Обрабатывает ввод от игрока для движения и поворота.
+    //Использует Quaternion.Lerp для плавного поворота игрока в направлении движения.
+    //Запускает анимацию движения в зависимости от ввода.
+    //Обрабатывает атаку при нажатии кнопки мыши, если _canHit равен true.
     {
         Vector3 moveInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
@@ -52,7 +63,7 @@ public class Player : MonoBehaviour
             StartCoroutine(Reload());
         }
     }
-    IEnumerator Reload() //куратина которая работает в потоке от других методов
+    IEnumerator Reload() //Используется для включения и выключения возможности атаки с заданным временем перезарядки.
     {
         _canHit = false;
         yield return new WaitForSeconds(reloadTime);
@@ -60,6 +71,9 @@ public class Player : MonoBehaviour
     }
 
     public void GetDamage(int damage)
+    //Вызывается, когда игрок получает урон.
+    //Уменьшает количество здоровья и обновляет UI.
+    //Если здоровье становится меньше или равно нулю, загружается сцена с индексом 0 (предположительно, это сцена смерти).
     {
         _health -= damage;
         ui.SetHealth(_health);
@@ -72,7 +86,11 @@ public class Player : MonoBehaviour
 
     private void Hit()
     {
-        
+        // Вызывается, когда игрок атакует.
+        //Использует Physics.OverlapSphere для определения объектов в радиусе атаки.
+        //Если объект -дерево(Tree) и оно возродилось, увеличивает счетчик деревьев и уничтожает дерево.
+        //Если объект -враг(Enemy), вызывает метод Die врага.
+
         Collider[] colliders = Physics.OverlapSphere(hitPoint.position, hitRadius);
         for (int i = 0; i < colliders.Length; i++)
         {
@@ -88,6 +106,33 @@ public class Player : MonoBehaviour
             }
         }
 
-       
+
+    }
+    public void RestoreHealth(int amount)
+    {
+        _health += amount;
+        // Ограничьте здоровье максимальным значением, если это необходимо
+        _health = Mathf.Clamp(_health, 0, startHealth);
+        ui.SetHealth(_health);
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Heart"))
+            
+        {
+            HeartSpawner heart = other.GetComponentInParent<HeartSpawner>();
+            if (heart != null)
+            {
+                RestoreHealth(heart.GetHealAmount());
+                Destroy(other.gameObject);
+            }
+        }
+    }
+    public IEnumerator DelayedRestoreHealth(int amount, GameObject heartObject)
+    {
+        yield return null; // Ждем один кадр
+
+        RestoreHealth(amount);
+        Destroy(heartObject);
     }
 }

@@ -5,10 +5,14 @@ using UnityEngine;
 
 public class PlayerUI : MonoBehaviour
 {
-    [SerializeField] private GameObject[] hearts;
-    [SerializeField] private TextMeshProUGUI treeCountText;
+    [SerializeField] private GameObject[] hearts; //Массив объектов (возможно, изображений) представляющих здоровье игрока.
+    [SerializeField] private TextMeshProUGUI treeCountText; //Объект TextMeshProUGUI для отображения количества собранных деревьев.
 
-    public void SetHealth(int health) 
+    public void SetHealth(int health)
+    //Принимает значение health, представляющее текущее количество здоровья игрока.
+    //Проверяет, не превышает ли health количество элементов в массиве hearts.
+    //Использует цикл для включения или выключения объектов в массиве hearts в зависимости от текущего здоровья.
+    //Если health > i, то hearts[i] включается(отображается), иначе - выключается.
     {
         if (health > hearts.Length) return;
 
@@ -18,13 +22,17 @@ public class PlayerUI : MonoBehaviour
         }
     }
     public int TreeCount
+    //Позволяет устанавливать и получать значение _treeCount.
+    //При установке значения _treeCount, обновляет текстовое поле для отображения количества собранных деревьев.
     {
         get => _treeCount;
         set
         {
+            //Устанавливает значение _treeCount и обновляет текстовое поле treeCountText для отображения количества собранных деревьев.
             _treeCount = value;
             treeCountText.SetText(_treeCount.ToString());
         }
     }
-    public int _treeCount;
+    public int _treeCount; //Приватная переменная для хранения количества собранных деревьев.
+    
 }
