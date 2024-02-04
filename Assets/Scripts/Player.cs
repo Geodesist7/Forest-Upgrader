@@ -9,16 +9,22 @@ public class Player : MonoBehaviour
     [SerializeField] private float speed; //Определяет скорость движения игрока.
     [SerializeField] private float rotationSpeed; //Определяет скорость поворота игрока.
     [SerializeField] private float reloadTime; //Время перезарядки между атаками.
-    [SerializeField] private int startHealth; //Начальное количество здоровья игрока.
+    [SerializeField] private int startHealth =5; //Начальное количество здоровья игрока.
     [SerializeField] private PlayerUI ui; //Ссылка на компонент интерфейса игрока (вероятно, UI, который отображает здоровье и другую информацию).
     [SerializeField] private Transform hitPoint; //Точка, откуда начинается атака.
     [SerializeField] private float hitRadius; //Радиус атаки игрока.
+    [SerializeField] private AudioClip hitSound; // Новая переменная для аудиоклипа
+    [SerializeField] private AudioClip runSound;
+    [SerializeField] private AudioClip pickupSound;// Переменная для звука подбора сердца
 
 
     private Rigidbody _rb; //Ссылка на компонент Rigidbody игрока.
     private Animator _anim; //Ссылка на компонент Animator игрока.
     private bool _canHit = true; //Флаг, указывающий, может ли игрок совершить атаку в данный момент.
     private int _health; //Текущее количество здоровья игрока.
+    private AudioSource audioSource;
+    private AudioSource runAudioSource;
+    private AudioSource pickupAudioSource; // Компонент AudioSource для воспроизведения звука
 
     private void Start()
     // Метод Вызывается при запуске сцены.
@@ -29,6 +35,18 @@ public class Player : MonoBehaviour
         _anim = GetComponent<Animator>();
 
         _health = startHealth;
+
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.clip = hitSound;
+        audioSource.playOnAwake = false; // Отключаем воспроизведение при активации объекта
+
+        runAudioSource = gameObject.AddComponent<AudioSource>();
+        runAudioSource.clip = runSound;
+        runAudioSource.playOnAwake = false;
+
+        pickupAudioSource = gameObject.AddComponent<AudioSource>();
+        pickupAudioSource.clip = pickupSound;
+        pickupAudioSource.playOnAwake = false;
     }
 
     private void FixedUpdate()
@@ -44,23 +62,50 @@ public class Player : MonoBehaviour
     //Обрабатывает атаку при нажатии кнопки мыши, если _canHit равен true.
     {
         Vector3 moveInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        bool isMoving = moveInput.magnitude > 0.1f;
 
-        if (moveInput.magnitude > 0.1f) //если длина вектора больше 0.1 то выполняем поворот
+        if (isMoving)
         {
-            //поворот игрока:
             Quaternion rotation = Quaternion.LookRotation(moveInput);
             rotation.x = 0;
             rotation.z = 0;
-            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime); //плавное перемещение 
+            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime);
 
+            _rb.velocity = moveInput * speed;
+            _anim.SetBool("isWalk", true);
+
+            // Воспроизводить звук бега, если его воспроизведение не начато
+            if (!runAudioSource.isPlaying)
+            {
+                runAudioSource.Play();
+            }
         }
-        _rb.velocity = moveInput * speed;
-        _anim.SetBool("isWalk", moveInput.magnitude > 0.1f);
+        else
+        {
+            _rb.velocity = Vector3.zero;
+            _anim.SetBool("isWalk", false);
+
+            // Остановить воспроизведение звука бега, если он воспроизводится
+            if (runAudioSource.isPlaying)
+            {
+                runAudioSource.Stop();
+            }
+        }
+
 
         if (Input.GetMouseButton(0) && _canHit == true)
         {
             _anim.SetTrigger("attack");
             StartCoroutine(Reload());
+            PlayHitSound();
+        }
+    }
+    private void PlayHitSound()
+    {
+        // Проверяем, что есть аудио и не проигрывается
+        if (audioSource != null && !audioSource.isPlaying)
+        {
+            audioSource.Play();
         }
     }
     IEnumerator Reload() //Используется для включения и выключения возможности атаки с заданным временем перезарядки.
@@ -118,14 +163,24 @@ public class Player : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Heart"))
-            
         {
             HeartSpawner heart = other.GetComponentInParent<HeartSpawner>();
             if (heart != null)
             {
                 RestoreHealth(heart.GetHealAmount());
                 Destroy(other.gameObject);
+
+                // Воспроизводим звук подбора сердца
+                PlayPickupSound();
             }
+        }
+    }
+
+    private void PlayPickupSound()
+    {
+        if (pickupAudioSource != null)
+        {
+            pickupAudioSource.Play();
         }
     }
     public IEnumerator DelayedRestoreHealth(int amount, GameObject heartObject)

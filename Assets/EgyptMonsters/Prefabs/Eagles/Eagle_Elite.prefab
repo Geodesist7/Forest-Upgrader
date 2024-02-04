@@ -668,7 +668,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4035234843597502}
   - component: {fileID: 95314990381142746}
-  - component: {fileID: -5961892833784823494}
+  - component: {fileID: 7199400862140051387}
   m_Layer: 6
   m_Name: Eagle_Elite
   m_TagString: Untagged
@@ -714,7 +714,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &-5961892833784823494
+--- !u!114 &7199400862140051387
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -726,11 +726,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 192813db1e645144b9481a0554a37a22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveRangeXZ: 100
-  fixedHeight: 7
+  moveRangeXZ: 111
+  fixedHeight: 15
   moveSpeed: 5
-  rotationSpeed: 180
-  duration: 10
+  duration: 5
 --- !u!1 &1585751792936906
 GameObject:
   m_ObjectHideFlags: 0

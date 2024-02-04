@@ -93,6 +93,11 @@ PrefabInstance:
       propertyPath: m_Radius
       value: 0.73
       objectReference: {fileID: 0}
+    - target: {fileID: 3084091502927637992, guid: d8ebd34c38d3d0a40b5422c0fd136471,
+        type: 3}
+      propertyPath: spawnSound
+      value: 
+      objectReference: {fileID: 8300000, guid: f451960ff86a42441a4731f00c2f9fc0, type: 3}
     - target: {fileID: 3973215964336516645, guid: d8ebd34c38d3d0a40b5422c0fd136471,
         type: 3}
       propertyPath: m_Enabled

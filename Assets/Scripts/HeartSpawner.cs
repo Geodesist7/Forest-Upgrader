@@ -41,8 +41,8 @@ public class HeartSpawner : MonoBehaviour
 
     private Vector3 GetRandomSpawnPosition()
     {
-        float spawnX = Random.Range(-10f, 10f);
-        float spawnZ = Random.Range(-10f, 10f);
+        float spawnX = Random.Range(-30f, 30f);
+        float spawnZ = Random.Range(-30f, 30f);
         return new Vector3(spawnX, 0.5f, spawnZ); // „тобы сердце по€вл€лось над поверхностью
     }
 
