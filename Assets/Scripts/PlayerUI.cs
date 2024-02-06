@@ -20,6 +20,7 @@ public class PlayerUI : MonoBehaviour
         {
             hearts[i].SetActive(health > i); //SetActive вкл и выкл объект (в нашем случае хп)
         }
+        HighScoreManager.instance.UpdateHighScore(_treeCount);
     }
     public int TreeCount
     //ѕозвол€ет устанавливать и получать значение _treeCount.
@@ -31,6 +32,8 @@ public class PlayerUI : MonoBehaviour
             //”станавливает значение _treeCount и обновл€ет текстовое поле treeCountText дл€ отображени€ количества собранных деревьев.
             _treeCount = value;
             treeCountText.SetText(_treeCount.ToString());
+
+            HighScoreManager.instance.UpdateHighScore(_treeCount);
         }
     }
     public int _treeCount; //ѕриватна€ переменна€ дл€ хранени€ количества собранных деревьев.
