@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float speed; //Определяет скорость движения игрока.
     [SerializeField] private float rotationSpeed; //Определяет скорость поворота игрока.
     [SerializeField] private float reloadTime; //Время перезарядки между атаками.
-    [SerializeField] private int startHealth =5; //Начальное количество здоровья игрока.
+    [SerializeField] private int startHealth = 5; //Начальное количество здоровья игрока.
     [SerializeField] private PlayerUI ui; //Ссылка на компонент интерфейса игрока (вероятно, UI, который отображает здоровье и другую информацию).
     [SerializeField] private Transform hitPoint; //Точка, откуда начинается атака.
     [SerializeField] private float hitRadius; //Радиус атаки игрока.
@@ -26,10 +26,12 @@ public class Player : MonoBehaviour
     private AudioSource runAudioSource;
     private AudioSource pickupAudioSource; // Компонент AudioSource для воспроизведения звука
 
+    private Vector3 startTouchPos; // Глобальное поле для хранения позиции начала касания
+
     private void Start()
     // Метод Вызывается при запуске сцены.
     //Инициализирует необходимые компоненты и переменные.
-     
+
     {
         _rb = GetComponent<Rigidbody>();
         _anim = GetComponent<Animator>();
@@ -55,26 +57,79 @@ public class Player : MonoBehaviour
     {
         MovePlayer();
     }
-    private void MovePlayer()
-    // Обрабатывает ввод от игрока для движения и поворота.
-    //Использует Quaternion.Lerp для плавного поворота игрока в направлении движения.
-    //Запускает анимацию движения в зависимости от ввода.
-    //Обрабатывает атаку при нажатии кнопки мыши, если _canHit равен true.
-    {
-        Vector3 moveInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-        bool isMoving = moveInput.magnitude > 0.1f;
+    //private void MovePlayer()
+    //// Обрабатывает ввод от игрока для движения и поворота.
+    ////Использует Quaternion.Lerp для плавного поворота игрока в направлении движения.
+    ////Запускает анимацию движения в зависимости от ввода.
+    ////Обрабатывает атаку при нажатии кнопки мыши, если _canHit равен true.
+    //{
+    //    Vector3 moveInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+    //    bool isMoving = moveInput.magnitude > 0.1f;
 
-        if (isMoving)
+    //    if (isMoving)
+    //    {
+    //        Quaternion rotation = Quaternion.LookRotation(moveInput);
+    //        rotation.x = 0;
+    //        rotation.z = 0;
+    //        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime);
+
+    //        _rb.velocity = moveInput * speed;
+    //        _anim.SetBool("isWalk", true);
+
+    //        // Воспроизводить звук бега, если его воспроизведение не начато
+    //        if (!runAudioSource.isPlaying)
+    //        {
+    //            runAudioSource.Play();
+    //        }
+    //    }
+    //    else
+    //    {
+    //        _rb.velocity = Vector3.zero;
+    //        _anim.SetBool("isWalk", false);
+
+    //        // Остановить воспроизведение звука бега, если он воспроизводится
+    //        if (runAudioSource.isPlaying)
+    //        {
+    //            runAudioSource.Stop();
+    //        }
+    //    }
+
+
+    //    if (Input.GetMouseButton(0) && _canHit == true)
+    //    {
+    //        _anim.SetTrigger("attack");
+    //        StartCoroutine(Reload());
+    //        PlayHitSound();
+    //    }
+    //}
+
+    private void MovePlayer()
+    {
+        // Если было касание по экрану
+        if (Input.GetMouseButtonDown(0))
         {
+            startTouchPos = Input.mousePosition; // Сохраняем позицию начала касания
+        }
+        // Если продолжается касание
+        else if (Input.GetMouseButton(0))
+        {
+            Vector3 touchDelta = Input.mousePosition - startTouchPos; // Разница между начальной и текущей позициями касания
+            Vector3 moveInput = new Vector3(touchDelta.x, 0, touchDelta.y); // Создаем вектор движения
+
+            // Нормализуем вектор движения, чтобы установить максимальную скорость
+            moveInput.Normalize();
+
+            // Поворачиваем персонажа в направлении движения
             Quaternion rotation = Quaternion.LookRotation(moveInput);
             rotation.x = 0;
             rotation.z = 0;
             transform.rotation = Quaternion.Lerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime);
 
+            // Двигаем персонажа в направлении касания
             _rb.velocity = moveInput * speed;
             _anim.SetBool("isWalk", true);
 
-            // Воспроизводить звук бега, если его воспроизведение не начато
+            // Воспроизводим звук бега, если его воспроизведение не начато
             if (!runAudioSource.isPlaying)
             {
                 runAudioSource.Play();
@@ -82,19 +137,21 @@ public class Player : MonoBehaviour
         }
         else
         {
+            // Если нет касаний, останавливаем движение и анимацию
             _rb.velocity = Vector3.zero;
             _anim.SetBool("isWalk", false);
 
-            // Остановить воспроизведение звука бега, если он воспроизводится
+            // Останавливаем воспроизведение звука бега, если он воспроизводится
             if (runAudioSource.isPlaying)
             {
                 runAudioSource.Stop();
             }
         }
 
-
-        if (Input.GetMouseButton(0) && _canHit == true)
+        // Проверяем нажатие на экране для атаки
+        if (Input.GetMouseButtonDown(0) && _canHit)
         {
+            // Запускаем атаку
             _anim.SetTrigger("attack");
             StartCoroutine(Reload());
             PlayHitSound();
